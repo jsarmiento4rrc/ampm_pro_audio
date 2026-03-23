@@ -10,7 +10,12 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+    <body>
+    <nav style="padding: 10px; background: #eee; margin-bottom: 20px;">
+      <%= link_to "Home (Catalog)", root_path %> | 
+      <%= link_to "About the Project", about_path %>
+    </nav>
+    
     <%= yield %>
   </body>
 </html>
