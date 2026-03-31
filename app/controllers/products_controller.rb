@@ -13,6 +13,9 @@ class ProductsController < ApplicationController
     if params[:category_id].present?
       @products = @products.where(category_id: params[:category_id])
     end
+
+    # Feature 2.5: Paginate the final result (10 products per page)
+    @products = @products.page(params[:page]).per(10)
   end
 
   def show
