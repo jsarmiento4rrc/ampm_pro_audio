@@ -1,0 +1,5 @@
+<li style="margin-bottom: 15px;">
+  <strong><%= link_to product.product_name, product %></strong><br>
+  Category: <%= product.category.category_name %><br>
+  Price: <%= number_to_currency(product.price) %>
+</li>

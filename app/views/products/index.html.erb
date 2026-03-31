@@ -1,18 +1,20 @@
 <h1>ampm Pro Audio - Product Catalog</h1>
 
-<!-- Search Feature 2.6 -->
 <div style="margin-bottom: 20px; padding: 15px; background: #e9ecef; border-radius: 5px;">
   <%= form_with url: root_path, method: :get, local: true do |f| %>
     
     <%= f.label :keyword, "Keyword:", style: "margin-right: 5px;" %>
-    <%= f.text_field :keyword, value: params[:keyword], placeholder: "Search gear...", style: "padding: 5px; width: 200px; margin-right: 15px;" %>
+    <%= f.text_field :keyword, value: params[:keyword], placeholder: "Search gear...", style: "padding: 5px; width: 150px; margin-right: 15px;" %>
     
     <%= f.label :category_id, "Category:", style: "margin-right: 5px;" %>
     <%= f.collection_select :category_id, Category.all, :id, :category_name, { include_blank: "All Categories", selected: params[:category_id] }, { style: "padding: 5px; margin-right: 15px;" } %>
     
+    <%= f.label :filter, "Filter By:", style: "margin-right: 5px;" %>
+    <%= f.select :filter, options_for_select([["All", ""], ["New (Last 3 Days)", "new"], ["Recently Updated", "recently_updated"]], params[:filter]), {}, { style: "padding: 5px; margin-right: 15px;" } %>
+    
     <%= f.submit "Search", style: "padding: 5px 15px;" %>
     
-    <% if params[:keyword].present? || params[:category_id].present? %>
+    <% if params[:keyword].present? || params[:category_id].present? || params[:filter].present? %>
       <%= link_to "Clear Results", root_path, style: "margin-left: 10px; color: red;" %>
     <% end %>
     
@@ -22,16 +24,9 @@
 <p><strong>Showing <%= @products.total_count %> total items</strong></p>
 
 <ul>
-  <% @products.each do |product| %>
-    <li style="margin-bottom: 15px;">
-      <strong><%= link_to product.product_name, product %></strong><br>
-      Category: <%= product.category.category_name %><br>
-      Price: <%= number_to_currency(product.price) %>
-    </li>
-  <% end %>
+  <%= render partial: "product", collection: @products %>
 </ul>
 
-<!-- Feature 2.5 Pagination Links -->
 <div style="margin-top: 20px; font-weight: bold;">
   <%= paginate @products %>
 </div>
