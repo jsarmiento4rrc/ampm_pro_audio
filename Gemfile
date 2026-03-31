@@ -71,3 +71,6 @@ group :test do
 end
 
 gem 'faker'
+gem "activeadmin", "~> 3.5"
+gem "devise", "~> 5.0"
+gem "image_processing", "~> 1.14"
