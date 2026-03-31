@@ -1,9 +1,24 @@
 <h1><%= @product.product_name %></h1>
 
+<% if @product.image.attached? %>
+  <%= image_tag @product.image, style: "max-width: 300px; display: block; margin-bottom: 20px;" %>
+<% end %>
+
 <p><strong>Category:</strong> <%= @product.category.category_name %></p>
 <p><strong>Price:</strong> <%= number_to_currency(@product.price) %></p>
 <p><strong>Stock Quantity:</strong> <%= @product.stock_quantity %></p>
 <p><strong>Description:</strong> <%= @product.description %></p>
+
+<div style="margin: 20px 0; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; max-width: 300px;">
+  <%= form_with url: cart_add_path, method: :post do |f| %>
+    <%= f.hidden_field :product_id, value: @product.id %>
+    <div style="margin-bottom: 10px;">
+      <%= f.label :quantity, "Quantity:" %>
+      <%= f.number_field :quantity, value: 1, min: 1, max: @product.stock_quantity, style: "width: 60px;" %>
+    </div>
+    <%= f.submit "Add to Cart" %>
+  <% end %>
+</div>
 
 <br>
 <%= link_to "Back to Catalog", root_path %>

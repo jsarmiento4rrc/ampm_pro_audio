@@ -1,21 +1,11 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>AmpmProAudio</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
-  </head>
-
-    <body>
-    <nav style="padding: 10px; background: #eee; margin-bottom: 20px;">
+<body>
+    <nav style="padding: 15px; background: #eee; margin-bottom: 20px;">
       <%= link_to "Home (Catalog)", root_path %> | 
-      <%= link_to "About the Project", about_path %>
+      <%= link_to "About the Project", about_path %> |
+      <strong><%= link_to "Cart (#{session[:cart].values.sum})", cart_path %></strong>
     </nav>
     
-    <%= yield %>
+    <div style="padding: 0 20px;">
+      <%= yield %>
+    </div>
   </body>
-</html>
