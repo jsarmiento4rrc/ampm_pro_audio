@@ -6,6 +6,11 @@ Rails.application.routes.draw do
   root "products#index"
   resources :products, only: [:index, :show]
   
+  # Shopping Cart Routes
+  post "cart/add", to: "cart#add", as: "cart_add"
+  delete "cart/remove", to: "cart#remove", as: "cart_remove"
+  
+  # Checkout Route
   get "checkout", to: "checkout#index", as: "checkout"
   
   # Static Pages Routes

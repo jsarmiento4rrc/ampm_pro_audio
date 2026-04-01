@@ -6,42 +6,75 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
-    <header style="padding: 10px; background: #333; color: white; margin-bottom: 20px;">
-      <nav style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <%= link_to "Home (Catalog)", root_path, style: "color: white; margin-right: 15px; text-decoration: none;" %>
-          <%= link_to "About Us", about_path, style: "color: white; margin-right: 15px; text-decoration: none;" %>
-          <%= link_to "Contact", contact_path, style: "color: white; margin-right: 15px; text-decoration: none;" %>
-          <%= link_to "Cart (#{@cart ? @cart.values.sum : 0})", checkout_path, style: "color: white; text-decoration: none;" %>
-        </div>
-        
-        <div>
-          <% if customer_signed_in? %>
-            <span style="margin-right: 15px;">Hello, <%= current_customer.first_name %>!</span>
-            <%= link_to "Edit Profile", edit_customer_registration_path, style: "color: lightblue; margin-right: 15px; text-decoration: none;" %>
-            <%= button_to "Log Out", destroy_customer_session_path, method: :delete, data: { turbo: "false" }, style: "background: transparent; border: none; color: #dc3545; cursor: pointer; font-size: 16px; padding: 0;" %>
-          <% else %>
-            <%= link_to "Log In", new_customer_session_path, style: "color: lightblue; margin-right: 15px; text-decoration: none;" %>
-            <%= link_to "Sign Up", new_customer_registration_path, style: "color: lightgreen; text-decoration: none;" %>
-          <% end %>
-        </div>
-      </nav>
-    </header>
+    <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <%= link_to "ampm Pro Audio", root_path, class: "navbar-item has-text-weight-bold is-size-4" %>
+      </div>
 
-    <% if notice %>
-      <p style="color: green; padding: 10px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px;"><%= notice %></p>
-    <% end %>
-    <% if alert %>
-      <p style="color: red; padding: 10px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px;"><%= alert %></p>
-    <% end %>
+      <div class="navbar-menu is-active">
+        <div class="navbar-start">
+          <%= link_to "Catalog", root_path, class: "navbar-item" %>
+          <%= link_to "About Us", about_path, class: "navbar-item" %>
+          <%= link_to "Contact", contact_path, class: "navbar-item" %>
+        </div>
 
-    <main style="padding: 0 20px;">
-      <%= yield %>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <%= link_to checkout_path, class: "button is-primary is-outlined" do %>
+              <span class="icon"><i class="fas fa-shopping-cart"></i></span>
+              <span>Cart (<%= @cart ? @cart.values.sum : 0 %>)</span>
+            <% end %>
+          </div>
+
+          <div class="navbar-item">
+            <div class="buttons">
+              <% if customer_signed_in? %>
+                <span class="navbar-item">Hello, <%= current_customer.first_name %>!</span>
+                <%= link_to "Edit Profile", edit_customer_registration_path, class: "button is-light is-small" %>
+                <%= button_to "Log Out", destroy_customer_session_path, method: :delete, data: { turbo: "false" }, class: "button is-danger is-small" %>
+              <% else %>
+                <%= link_to "Sign Up", new_customer_registration_path, class: "button is-primary" %>
+                <%= link_to "Log In", new_customer_session_path, class: "button is-light" %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <section class="section pt-4 pb-0">
+      <div class="container">
+        <% if notice %>
+          <div class="notification is-success is-light"><%= notice %></div>
+        <% end %>
+        <% if alert %>
+          <div class="notification is-danger is-light"><%= alert %></div>
+        <% end %>
+      </div>
+    </section>
+
+    <main class="section">
+      <div class="container">
+        <%= yield %>
+      </div>
     </main>
+
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong>ampm Pro Audio</strong> by Jeffrey D. Sarmiento. <br>
+          Full Stack Web Development - Red River College.
+        </p>
+      </div>
+    </footer>
   </body>
 </html>

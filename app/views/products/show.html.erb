@@ -1,24 +1,48 @@
-<h1><%= @product.product_name %></h1>
-
-<% if @product.image.attached? %>
-  <%= image_tag @product.image, style: "max-width: 300px; display: block; margin-bottom: 20px;" %>
-<% end %>
-
-<p><strong>Category:</strong> <%= @product.category.category_name %></p>
-<p><strong>Price:</strong> <%= number_to_currency(@product.price) %></p>
-<p><strong>Stock Quantity:</strong> <%= @product.stock_quantity %></p>
-<p><strong>Description:</strong> <%= @product.description %></p>
-
-<div style="margin: 20px 0; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; max-width: 300px;">
-  <%= form_with url: cart_add_path, method: :post do |f| %>
-    <%= f.hidden_field :product_id, value: @product.id %>
-    <div style="margin-bottom: 10px;">
-      <%= f.label :quantity, "Quantity:" %>
-      <%= f.number_field :quantity, value: 1, min: 1, max: @product.stock_quantity, style: "width: 60px;" %>
+<div class="box mt-4">
+  <div class="columns is-vcentered">
+    
+    <div class="column is-half">
+      <% if @product.image.attached? %>
+        <figure class="image">
+          <%= image_tag @product.image, style: "border-radius: 8px; max-height: 500px; object-fit: contain;" %>
+        </figure>
+      <% else %>
+        <div class="notification is-light has-text-centered">
+          No image available for this product.
+        </div>
+      <% end %>
     </div>
-    <%= f.submit "Add to Cart" %>
-  <% end %>
-</div>
 
-<br>
-<%= link_to "Back to Catalog", root_path %>
+    <div class="column is-half">
+      <p class="is-size-6 has-text-grey is-uppercase mb-2"><%= @product.category.category_name %></p>
+      <h1 class="title is-2 mb-4"><%= @product.product_name %></h1>
+      <h2 class="title is-3 has-text-primary mb-5"><%= number_to_currency(@product.price) %></h2>
+      
+      <div class="content is-medium mb-6">
+        <p><%= @product.description %></p>
+      </div>
+
+      <div class="box has-background-light">
+        <%= form_with url: cart_add_path, method: :post do |f| %>
+          <%= f.hidden_field :product_id, value: @product.id %>
+          
+          <div class="field is-grouped is-align-items-flex-end">
+            <div class="control">
+              <%= f.label :quantity, "Quantity", class: "label" %>
+              <div class="select">
+                <%= f.select :quantity, (1..10).to_a, selected: 1 %>
+              </div>
+            </div>
+            
+            <div class="control">
+              <%= f.submit "Add to Cart", class: "button is-primary is-medium" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <%= link_to "← Back to Catalog", root_path, class: "button is-text mt-4" %>
+    </div>
+
+  </div>
+</div>

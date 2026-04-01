@@ -1,32 +1,49 @@
-<h1>ampm Pro Audio - Product Catalog</h1>
+<div class="is-flex is-justify-content-space-between is-align-items-flex-end mb-5">
+  <h1 class="title is-2 mb-0">Product Catalog</h1>
+  <p class="subtitle is-6 has-text-grey mb-1">Showing <%= @products.total_count %> items</p>
+</div>
 
-<div style="margin-bottom: 20px; padding: 15px; background: #e9ecef; border-radius: 5px;">
+<div class="box has-background-light mb-6">
   <%= form_with url: root_path, method: :get, local: true do |f| %>
-    
-    <%= f.label :keyword, "Keyword:", style: "margin-right: 5px;" %>
-    <%= f.text_field :keyword, value: params[:keyword], placeholder: "Search gear...", style: "padding: 5px; width: 150px; margin-right: 15px;" %>
-    
-    <%= f.label :category_id, "Category:", style: "margin-right: 5px;" %>
-    <%= f.collection_select :category_id, Category.all, :id, :category_name, { include_blank: "All Categories", selected: params[:category_id] }, { style: "padding: 5px; margin-right: 15px;" } %>
-    
-    <%= f.label :filter, "Filter By:", style: "margin-right: 5px;" %>
-    <%= f.select :filter, options_for_select([["All", ""], ["New (Last 3 Days)", "new"], ["Recently Updated", "recently_updated"]], params[:filter]), {}, { style: "padding: 5px; margin-right: 15px;" } %>
-    
-    <%= f.submit "Search", style: "padding: 5px 15px;" %>
-    
-    <% if params[:keyword].present? || params[:category_id].present? || params[:filter].present? %>
-      <%= link_to "Clear Results", root_path, style: "margin-left: 10px; color: red;" %>
-    <% end %>
-    
+    <div class="field is-grouped is-grouped-multiline is-align-items-flex-end">
+      
+      <div class="control">
+        <%= f.label :keyword, "Keyword", class: "label is-small has-text-grey" %>
+        <%= f.text_field :keyword, value: params[:keyword], placeholder: "Search gear...", class: "input" %>
+      </div>
+
+      <div class="control">
+        <%= f.label :category_id, "Category", class: "label is-small has-text-grey" %>
+        <div class="select">
+          <%= f.collection_select :category_id, Category.all, :id, :category_name, { include_blank: "All Categories", selected: params[:category_id] } %>
+        </div>
+      </div>
+
+      <div class="control">
+        <%= f.label :filter, "Filter By", class: "label is-small has-text-grey" %>
+        <div class="select">
+          <%= f.select :filter, options_for_select([["All", ""], ["New (Last 3 Days)", "new"], ["Recently Updated", "recently_updated"]], params[:filter]) %>
+        </div>
+      </div>
+
+      <div class="control">
+        <%= f.submit "Search", class: "button is-dark" %>
+      </div>
+
+      <% if params[:keyword].present? || params[:category_id].present? || params[:filter].present? %>
+        <div class="control">
+          <%= link_to "Clear Filters", root_path, class: "button is-text has-text-danger" %>
+        </div>
+      <% end %>
+
+    </div>
   <% end %>
 </div>
 
-<p><strong>Showing <%= @products.total_count %> total items</strong></p>
-
-<ul>
+<div class="columns is-multiline">
   <%= render partial: "product", collection: @products %>
-</ul>
+</div>
 
-<div style="margin-top: 20px; font-weight: bold;">
+<div class="is-flex is-justify-content-center mt-6">
   <%= paginate @products %>
 </div>
