@@ -1,0 +1,61 @@
+<div style="max-width: 500px; margin: 0 auto; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+  <h2>Edit <%= resource_name.to_s.humanize %></h2>
+
+  <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+
+    <div style="margin-bottom: 15px;">
+      <%= f.label :first_name %><br />
+      <%= f.text_field :first_name, autofocus: true, style: "width: 100%; padding: 8px;" %>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <%= f.label :last_name %><br />
+      <%= f.text_field :last_name, style: "width: 100%; padding: 8px;" %>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <%= f.label :address %><br />
+      <%= f.text_field :address, style: "width: 100%; padding: 8px;" %>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <%= f.label :province_id, "Province" %><br />
+      <%= f.collection_select :province_id, Province.order(:name), :id, :name, { prompt: "Select a Province" }, { style: "width: 100%; padding: 8px;" } %>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <%= f.label :phone %><br />
+      <%= f.text_field :phone, style: "width: 100%; padding: 8px;" %>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <%= f.label :email %><br />
+      <%= f.email_field :email, autocomplete: "email", style: "width: 100%; padding: 8px;" %>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <%= f.label :password %> <i>(leave blank if you don't want to change it)</i><br />
+      <%= f.password_field :password, autocomplete: "new-password", style: "width: 100%; padding: 8px;" %>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <%= f.label :password_confirmation %><br />
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", style: "width: 100%; padding: 8px;" %>
+    </div>
+
+    <div style="margin-bottom: 20px; padding: 10px; background: #e9ecef; border-left: 4px solid #ffc107;">
+      <%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i><br />
+      <%= f.password_field :current_password, autocomplete: "current-password", style: "width: 100%; padding: 8px;" %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "Update Profile", style: "padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;" %>
+    </div>
+  <% end %>
+
+  <h3 style="margin-top: 30px;">Cancel my account</h3>
+  <p>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete, style: "background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;" %></p>
+  
+  <%= link_to "Back", :back %>
+</div>

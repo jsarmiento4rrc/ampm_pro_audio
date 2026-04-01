@@ -1,11 +1,33 @@
 <body>
-    <nav style="padding: 15px; background: #eee; margin-bottom: 20px;">
-      <%= link_to "Home (Catalog)", root_path %> | 
-      <%= link_to "About the Project", about_path %> |
-      <strong><%= link_to "Cart (#{session[:cart].values.sum})", cart_path %></strong>
-    </nav>
-    
-    <div style="padding: 0 20px;">
+    <header style="padding: 10px; background: #333; color: white; margin-bottom: 20px;">
+      <nav style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <%= link_to "Home (Catalog)", root_path, style: "color: white; margin-right: 15px; text-decoration: none;" %>
+          <a href="#" style="color: white; margin-right: 15px; text-decoration: none;">About the Project</a>
+          <%= link_to "Cart (#{@cart ? @cart.values.sum : 0})", '#', style: "color: white; text-decoration: none;" %>
+        </div>
+        
+        <div>
+          <% if customer_signed_in? %>
+            <span style="margin-right: 15px;">Hello, <%= current_customer.first_name %>!</span>
+            <%= link_to "Edit Profile", edit_customer_registration_path, style: "color: lightblue; margin-right: 15px; text-decoration: none;" %>
+            <%= button_to "Log Out", destroy_customer_session_path, method: :delete, data: { turbo: "false" }, style: "background: transparent; border: none; color: #dc3545; cursor: pointer; font-size: 16px; padding: 0;" %>
+          <% else %>
+            <%= link_to "Log In", new_customer_session_path, style: "color: lightblue; margin-right: 15px; text-decoration: none;" %>
+            <%= link_to "Sign Up", new_customer_registration_path, style: "color: lightgreen; text-decoration: none;" %>
+          <% end %>
+        </div>
+      </nav>
+    </header>
+
+    <% if notice %>
+      <p style="color: green; padding: 10px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px;"><%= notice %></p>
+    <% end %>
+    <% if alert %>
+      <p style="color: red; padding: 10px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px;"><%= alert %></p>
+    <% end %>
+
+    <main style="padding: 0 20px;">
       <%= yield %>
-    </div>
+    </main>
   </body>
