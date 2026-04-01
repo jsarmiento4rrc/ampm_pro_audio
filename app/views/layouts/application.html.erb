@@ -15,7 +15,8 @@
       <nav style="display: flex; justify-content: space-between; align-items: center;">
         <div>
           <%= link_to "Home (Catalog)", root_path, style: "color: white; margin-right: 15px; text-decoration: none;" %>
-          <a href="#" style="color: white; margin-right: 15px; text-decoration: none;">About the Project</a>
+          <%= link_to "About Us", about_path, style: "color: white; margin-right: 15px; text-decoration: none;" %>
+          <%= link_to "Contact", contact_path, style: "color: white; margin-right: 15px; text-decoration: none;" %>
           <%= link_to "Cart (#{@cart ? @cart.values.sum : 0})", checkout_path, style: "color: white; text-decoration: none;" %>
         </div>
         

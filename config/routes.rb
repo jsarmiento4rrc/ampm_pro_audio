@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   root "products#index"
   resources :products, only: [:index, :show]
   
-  # Add this specific route
   get "checkout", to: "checkout#index", as: "checkout"
+  
+  # Static Pages Routes
+  get "about", to: "pages#about", as: "about"
+  get "contact", to: "pages#contact", as: "contact"
 end
