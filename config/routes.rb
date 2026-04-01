@@ -10,8 +10,9 @@ Rails.application.routes.draw do
   post "cart/add", to: "cart#add", as: "cart_add"
   delete "cart/remove", to: "cart#remove", as: "cart_remove"
   
-  # Checkout Route
+  # Checkout Routes
   get "checkout", to: "checkout#index", as: "checkout"
+  post "checkout/create", to: "checkout#create", as: "checkout_create"
   
   # Static Pages Routes
   get "about", to: "pages#about", as: "about"
