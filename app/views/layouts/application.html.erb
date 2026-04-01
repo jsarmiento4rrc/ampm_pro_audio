@@ -1,10 +1,22 @@
-<body>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ampm Pro Audio</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
     <header style="padding: 10px; background: #333; color: white; margin-bottom: 20px;">
       <nav style="display: flex; justify-content: space-between; align-items: center;">
         <div>
           <%= link_to "Home (Catalog)", root_path, style: "color: white; margin-right: 15px; text-decoration: none;" %>
           <a href="#" style="color: white; margin-right: 15px; text-decoration: none;">About the Project</a>
-          <%= link_to "Cart (#{@cart ? @cart.values.sum : 0})", '#', style: "color: white; text-decoration: none;" %>
+          <%= link_to "Cart (#{@cart ? @cart.values.sum : 0})", checkout_path, style: "color: white; text-decoration: none;" %>
         </div>
         
         <div>
@@ -31,3 +43,4 @@
       <%= yield %>
     </main>
   </body>
+</html>
