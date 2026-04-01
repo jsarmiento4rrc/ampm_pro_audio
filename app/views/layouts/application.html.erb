@@ -7,7 +7,6 @@
     <%= csp_meta_tag %>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
@@ -31,7 +30,7 @@
           <div class="navbar-item">
             <%= link_to checkout_path, class: "button is-primary is-outlined" do %>
               <span class="icon"><i class="fas fa-shopping-cart"></i></span>
-              <span>Cart (<%= @cart ? @cart.values.sum : 0 %>)</span>
+              <span>Cart (<%= session[:cart].present? ? session[:cart].values.map(&:to_i).sum : 0 %>)</span>
             <% end %>
           </div>
 
@@ -39,6 +38,7 @@
             <div class="buttons">
               <% if customer_signed_in? %>
                 <span class="navbar-item">Hello, <%= current_customer.first_name %>!</span>
+                <%= link_to "Order History", orders_path, class: "button is-info is-small" %>
                 <%= link_to "Edit Profile", edit_customer_registration_path, class: "button is-light is-small" %>
                 <%= button_to "Log Out", destroy_customer_session_path, method: :delete, data: { turbo: "false" }, class: "button is-danger is-small" %>
               <% else %>

@@ -14,6 +14,9 @@ Rails.application.routes.draw do
   get "checkout", to: "checkout#index", as: "checkout"
   post "checkout/create", to: "checkout#create", as: "checkout_create"
   
+  # Order History Routes
+  resources :orders, only: [:index, :show]
+  
   # Static Pages Routes
   get "about", to: "pages#about", as: "about"
   get "contact", to: "pages#contact", as: "contact"

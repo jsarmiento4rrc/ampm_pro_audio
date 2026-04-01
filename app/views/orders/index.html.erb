@@ -1,0 +1,38 @@
+<div class="box mt-5 mx-auto" style="max-width: 900px;">
+  <h1 class="title is-3 mb-5" style="border-bottom: 2px solid #eee; padding-bottom: 10px;">My Order History</h1>
+
+  <% if @orders.any? %>
+    <table class="table is-fullwidth is-striped is-hoverable">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th class="has-text-right">Total</th>
+          <th class="has-text-centered">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @orders.each do |order| %>
+          <tr>
+            <td class="is-vcentered">#<%= order.id %></td>
+            <td class="is-vcentered"><%= order.created_at.strftime("%B %d, %Y") %></td>
+            <td class="is-vcentered">
+              <span class="tag <%= order.status == 'New' ? 'is-info' : 'is-success' %> is-light">
+                <%= order.status %>
+              </span>
+            </td>
+            <td class="has-text-right is-vcentered"><strong><%= number_to_currency(order.total) %></strong></td>
+            <td class="has-text-centered is-vcentered">
+              <%= link_to "View Receipt", order_path(order), class: "button is-small is-primary is-outlined" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="notification is-light has-text-centered">
+      You haven't placed any orders yet. Time to buy some gear!
+    </div>
+  <% end %>
+</div>

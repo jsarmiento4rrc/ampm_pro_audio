@@ -1,0 +1,53 @@
+<div class="box mt-5 mx-auto" style="max-width: 800px;">
+  <div class="is-flex is-justify-content-space-between is-align-items-center mb-5" style="border-bottom: 2px solid #eee; padding-bottom: 10px;">
+    <h1 class="title is-3 mb-0">Receipt #<%= @order.id %></h1>
+    <span class="tag is-info is-medium"><%= @order.status %></span>
+  </div>
+
+  <p class="mb-5 has-text-grey">Placed on <%= @order.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+
+  <table class="table is-fullwidth is-striped mt-4">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th class="has-text-centered">Qty</th>
+        <th class="has-text-right">Price</th>
+        <th class="has-text-right">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @order.line_items.each do |item| %>
+        <tr>
+          <td class="is-vcentered"><%= item.product.product_name %></td>
+          <td class="has-text-centered is-vcentered"><%= item.quantity %></td>
+          <td class="has-text-right is-vcentered"><%= number_to_currency(item.price) %></td>
+          <td class="has-text-right is-vcentered"><%= number_to_currency(item.price * item.quantity) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="has-text-right mt-5">
+    <p class="is-size-6 mb-1"><strong>Subtotal:</strong> <%= number_to_currency(@order.subtotal) %></p>
+    
+    <% if @order.gst > 0 %>
+      <p class="is-size-6 mb-1">GST: <%= number_to_currency(@order.gst) %></p>
+    <% end %>
+    
+    <% if @order.pst > 0 %>
+      <p class="is-size-6 mb-1">PST: <%= number_to_currency(@order.pst) %></p>
+    <% end %>
+    
+    <% if @order.hst > 0 %>
+      <p class="is-size-6 mb-1">HST: <%= number_to_currency(@order.hst) %></p>
+    <% end %>
+    
+    <h3 class="title is-4 mt-3 pt-3" style="border-top: 2px solid #eee;">
+      Total Paid: <%= number_to_currency(@order.total) %>
+    </h3>
+  </div>
+
+  <div class="mt-6">
+    <%= link_to "← Back to Order History", orders_path, class: "button is-text" %>
+  </div>
+</div>
