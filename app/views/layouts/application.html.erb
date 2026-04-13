@@ -51,6 +51,7 @@
                 </a>
                 <div class="navbar-dropdown is-right">
                   <%= link_to "Edit Profile", edit_customer_registration_path, class: "navbar-item" %>
+                  <%= link_to "Order History", orders_path, class: "navbar-item" %>
                   <hr class="navbar-divider">
                   <%= link_to "Sign Out", destroy_customer_session_path, data: { "turbo-method": :delete }, class: "navbar-item has-text-danger" %>
                 </div>

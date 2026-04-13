@@ -1,38 +1,32 @@
-<div class="box mt-5 mx-auto" style="max-width: 900px;">
-  <h1 class="title is-3 mb-5" style="border-bottom: 2px solid #eee; padding-bottom: 10px;">My Order History</h1>
+<div class="container">
+  <h1 class="title mt-5">My Order History</h1>
 
   <% if @orders.any? %>
-    <table class="table is-fullwidth is-striped is-hoverable">
+    <table class="table is-fullwidth is-striped">
       <thead>
         <tr>
-          <th>Order ID</th>
+          <th>Order #</th>
           <th>Date</th>
           <th>Status</th>
-          <th class="has-text-right">Total</th>
-          <th class="has-text-centered">Actions</th>
+          <th>Total</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         <% @orders.each do |order| %>
           <tr>
-            <td class="is-vcentered">#<%= order.id %></td>
-            <td class="is-vcentered"><%= order.created_at.strftime("%B %d, %Y") %></td>
-            <td class="is-vcentered">
-              <span class="tag <%= order.status == 'New' ? 'is-info' : 'is-success' %> is-light">
-                <%= order.status %>
-              </span>
-            </td>
-            <td class="has-text-right is-vcentered"><strong><%= number_to_currency(order.total) %></strong></td>
-            <td class="has-text-centered is-vcentered">
-              <%= link_to "View Receipt", order_path(order), class: "button is-small is-primary is-outlined" %>
-            </td>
+            <td><%= order.id %></td>
+            <td><%= order.created_at.strftime("%B %d, %Y") %></td>
+            <td><span class="tag is-info"><%= order.status.capitalize %></span></td>
+            <td><%= number_to_currency(order.total) %></td>
+            <td><%= link_to 'View Details', order_path(order), class: 'button is-small is-link' %></td>
           </tr>
         <% end %>
       </tbody>
     </table>
   <% else %>
-    <div class="notification is-light has-text-centered">
-      You haven't placed any orders yet. Time to buy some gear!
+    <div class="notification is-light">
+      You haven't placed any orders yet.
     </div>
   <% end %>
 </div>
