@@ -1,74 +1,112 @@
 class CheckoutController < ApplicationController
   before_action :authenticate_customer!
 
-  def index
-    @cart = session[:cart] || {}
-    if @cart.empty?
+  def create
+    # 1. Initialize Stripe with your secret key
+    Stripe.api_key = Rails.configuration.stripe[:secret_key]
+
+    # 2. Get the products from the session cart
+    cart = session[:cart] || {}
+    @products = Product.find(cart.keys)
+
+    if @products.empty?
       redirect_to root_path, alert: "Your cart is empty."
       return
     end
 
-    @province = current_customer.province
-    @subtotal = 0
-    @cart.each do |product_id, quantity|
-      product = Product.find_by(id: product_id)
-      @subtotal += (product.price * quantity) if product
-    end
+    # 3. Calculate Taxes based on Customer's Province (Requirement 3.3.1)
+    province = current_customer.province
+    gst_rate = province&.gst || 0
+    pst_rate = province&.pst || 0
+    hst_rate = province&.hst || 0
 
-    @gst = @subtotal * (@province.gst || 0)
-    @pst = @subtotal * (@province.pst || 0)
-    @hst = @subtotal * (@province.hst || 0)
-    @total = @subtotal + @gst + @pst + @hst
-  end
-
-  def create
-    # HARD-CODED KEY: This ensures the controller uses the correct key immediately
-    Stripe.api_key = 'STRIPE_SECRET_KEY_HIDDEN'
-    
-    @cart = session[:cart] || {}
-    @province = current_customer.province
-    
-    line_items = []
-    subtotal = 0
-
-    @cart.each do |product_id, quantity|
-      product = Product.find_by(id: product_id)
-      if product
-        subtotal += product.price * quantity
-        line_items << {
-          price_data: {
-            currency: 'cad',
-            product_data: { name: product.product_name },
-            unit_amount: (product.price * 100).to_i
+    # 4. Build Stripe Line Items
+    stripe_line_items = @products.map do |product|
+      quantity = cart[product.id.to_s]
+      {
+        price_data: {
+          currency: 'cad',
+          product_data: {
+            name: product.product_name,
+            description: product.description,
           },
-          quantity: quantity
-        }
-      end
+          unit_amount: (product.price * 100).to_i, # Stripe uses cents
+        },
+        quantity: quantity,
+      }
     end
 
-    # Add Tax line items
-    line_items << { price_data: { currency: 'cad', product_data: { name: 'GST' }, unit_amount: (subtotal * @province.gst * 100).to_i }, quantity: 1 } if @province.gst.to_f > 0
-    line_items << { price_data: { currency: 'cad', product_data: { name: 'PST' }, unit_amount: (subtotal * @province.pst * 100).to_i }, quantity: 1 } if @province.pst.to_f > 0
-    line_items << { price_data: { currency: 'cad', product_data: { name: 'HST' }, unit_amount: (subtotal * @province.hst * 100).to_i }, quantity: 1 } if @province.hst.to_f > 0
+    # 5. Add Taxes as separate line items (Requirement 3.3.1)
+    subtotal = @products.sum { |p| p.price * cart[p.id.to_s] }
+    
+    if gst_rate > 0
+      stripe_line_items << {
+        price_data: {
+          currency: 'cad',
+          product_data: { name: 'GST', description: "Goods and Services Tax (#{gst_rate * 100}%)" },
+          unit_amount: (subtotal * gst_rate * 100).to_i,
+        },
+        quantity: 1,
+      }
+    end
 
-    @session = Stripe::Checkout::Session.create(
+    if pst_rate > 0
+      stripe_line_items << {
+        price_data: {
+          currency: 'cad',
+          product_data: { name: 'PST', description: "Provincial Sales Tax (#{pst_rate * 100}%)" },
+          unit_amount: (subtotal * pst_rate * 100).to_i,
+        },
+        quantity: 1,
+      }
+    end
+
+    if hst_rate > 0
+      stripe_line_items << {
+        price_data: {
+          currency: 'cad',
+          product_data: { name: 'HST', description: "Harmonized Sales Tax (#{hst_rate * 100}%)" },
+          unit_amount: (subtotal * hst_rate * 100).to_i,
+        },
+        quantity: 1,
+      }
+    end
+
+    # 6. Create Stripe Session
+    @session = Stripe::Checkout::Session.create({
       payment_method_types: ['card'],
+      line_items: stripe_line_items,
       mode: 'payment',
       success_url: checkout_success_url + "?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: checkout_cancel_url,
       customer_email: current_customer.email,
-      line_items: line_items
-    )
+    })
 
-    redirect_to @session.url, allow_other_host: true
+    redirect_to @session.url, allow_other_host: true, status: 303
   end
 
   def success
+    @session = Stripe::Checkout::Session.retrieve(params[:session_id])
+    @payment_intent = Stripe::PaymentIntent.retrieve(@session.payment_intent)
+
+    # Requirement 3.2.1 & 3.3.2: Save Order to History
+    # This ensures even if product prices change later, the order record is permanent.
+    order = current_customer.orders.create(
+      stripe_payment_id: @session.id,
+      subtotal: @session.amount_subtotal / 100.0,
+      total: @session.amount_total / 100.0,
+      status: 'paid'
+    )
+
+    # Clear the cart after successful payment
     session[:cart] = {}
-    redirect_to root_path, notice: "Payment successful!"
+
+    flash[:notice] = "Payment successful! Your order has been placed."
+    redirect_to order_path(order)
   end
 
   def cancel
-    redirect_to cart_path, alert: "Payment cancelled."
+    flash[:alert] = "Payment was cancelled."
+    redirect_to cart_path
   end
 end
