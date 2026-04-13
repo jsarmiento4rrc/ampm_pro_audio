@@ -2,7 +2,7 @@ class CheckoutController < ApplicationController
   before_action :authenticate_customer!
 
   def create
-    # 1. Initialize Stripe with your secret key
+    # 1. Initialize Stripe with your secret key from the configuration
     Stripe.api_key = Rails.configuration.stripe[:secret_key]
 
     # 2. Get the products from the session cart
@@ -86,27 +86,39 @@ class CheckoutController < ApplicationController
   end
 
   def success
+    # Initialize Stripe key for the retrieval
+    Stripe.api_key = Rails.configuration.stripe[:secret_key]
+    
+    # Retrieve the session to get payment details
     @session = Stripe::Checkout::Session.retrieve(params[:session_id])
-    @payment_intent = Stripe::PaymentIntent.retrieve(@session.payment_intent)
-
-    # Requirement 3.2.1 & 3.3.2: Save Order to History
-    # This ensures even if product prices change later, the order record is permanent.
-    order = current_customer.orders.create(
+    
+    # Requirement 3.3.2 & 3.2.1: Create the permanent order record
+    @order = current_customer.orders.create!(
       stripe_payment_id: @session.id,
       subtotal: @session.amount_subtotal / 100.0,
+      gst: (@session.total_details.amount_tax / 100.0 if @session.total_details.amount_tax),
       total: @session.amount_total / 100.0,
       status: 'paid'
     )
 
-    # Clear the cart after successful payment
-    session[:cart] = {}
+    # Move items from session cart to permanent LineItems
+    cart = session[:cart] || {}
+    cart.each do |product_id, quantity|
+      product = Product.find(product_id)
+      @order.line_items.create!(
+        product: product,
+        quantity: quantity,
+        price: product.price # Saves the price at the moment of purchase for data integrity
+      )
+    end
 
-    flash[:notice] = "Payment successful! Your order has been placed."
-    redirect_to order_path(order)
+    # Requirement 4.2.3: Provide clear feedback and clear the cart
+    session[:cart] = {}
+    flash.now[:notice] = "Payment confirmed!"
   end
 
   def cancel
-    flash[:alert] = "Payment was cancelled."
+    flash[:alert] = "Payment was cancelled. Your cart is still saved."
     redirect_to cart_path
   end
 end
