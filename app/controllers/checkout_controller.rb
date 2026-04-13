@@ -23,7 +23,7 @@ class CheckoutController < ApplicationController
 
   def create
     # HARD-CODED KEY: This ensures the controller uses the correct key immediately
-    Stripe.api_key = 'sk_test_51THHZcCrPyiHw7vH3zXXD2gWiVV9wCzidmP2F9bKvBmiLRhzAyssc0XO0UtBUGluZjVPcAoGvonzY0FhE01CADeDY00Cxm7ouM1'
+    Stripe.api_key = 'STRIPE_SECRET_KEY_HIDDEN'
     
     @cart = session[:cart] || {}
     @province = current_customer.province
