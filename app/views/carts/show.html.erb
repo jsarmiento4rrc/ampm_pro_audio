@@ -1,0 +1,72 @@
+<div class="container mt-6">
+  <h1 class="title is-2">Your Shopping Cart</h1>
+
+  <% if @cart_items.any? %>
+    <div class="columns">
+      <div class="column is-8">
+        <div class="box">
+          <table class="table is-fullwidth is-hoverable">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th class="has-text-right">Price</th>
+                <th class="has-text-centered">Quantity</th>
+                <th class="has-text-right">Total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% subtotal = 0 %>
+              <% @cart_items.each do |item| %>
+                <% item_total = item[:product].price * item[:quantity] %>
+                <% subtotal += item_total %>
+                <tr>
+                  <td>
+                    <strong><%= item[:product].product_name %></strong>
+                  </td>
+                  <td class="has-text-right"><%= number_to_currency(item[:product].price) %></td>
+                  <td class="has-text-centered">
+                    <%= form_with url: update_cart_path(item[:product].id), method: :post, class: "is-inline-flex" do |f| %>
+                      <div class="field has-addons">
+                        <div class="control">
+                          <%= f.number_field :quantity, value: item[:quantity], min: 1, class: "input is-small", style: "width: 60px;" %>
+                        </div>
+                        <div class="control">
+                          <%= f.submit "Update", class: "button is-small is-info" %>
+                        </div>
+                      </div>
+                    <% end %>
+                  </td>
+                  <td class="has-text-right"><%= number_to_currency(item_total) %></td>
+                  <td class="has-text-centered">
+                    <%= link_to remove_from_cart_path(item[:product].id), data: { "turbo-method": :delete }, class: "has-text-danger" do %>
+                      <i class="fas fa-trash"></i>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="column is-4">
+        <div class="box has-background-light">
+          <h2 class="subtitle is-4">Summary</h2>
+          <div class="is-flex is-justify-content-space-between mb-5">
+            <span class="is-size-5">Subtotal</span>
+            <strong class="is-size-5"><%= number_to_currency(subtotal) %></strong>
+          </div>
+          <p class="is-size-7 has-text-grey mb-5">* Taxes will be calculated at checkout based on your province.</p>
+          <%= link_to "Proceed to Checkout", checkout_index_path, class: "button is-primary is-fullwidth is-large" %>
+          <%= link_to "Continue Shopping", root_path, class: "button is-fullwidth mt-3" %>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="notification is-light has-text-centered p-6">
+      <p class="is-size-4 mb-4">Your cart is currently empty.</p>
+      <%= link_to "Browse Catalog", root_path, class: "button is-primary" %>
+    </div>
+  <% end %>
+</div>

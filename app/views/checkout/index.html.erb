@@ -1,58 +1,83 @@
-<div class="box mt-5 mx-auto" style="max-width: 800px;">
-  <h1 class="title is-3 mb-5" style="border-bottom: 2px solid #eee; padding-bottom: 10px;">Checkout Invoice</h1>
+<div class="container mt-5">
+  <h1 class="title is-2">Review Your Order</h1>
 
-  <div class="columns mb-5">
-    <div class="column is-half">
-      <h2 class="title is-5 mb-2">Billed To:</h2>
-      <p class="is-size-6">
-        <strong><%= current_customer.first_name %> <%= current_customer.last_name %></strong><br>
-        <%= current_customer.address %><br>
-        <%= @province.name %>
-      </p>
+  <div class="columns">
+    <div class="column is-8">
+      <div class="box">
+        <h2 class="subtitle is-4">Shipping Information</h2>
+        <p class="mb-4">
+          <strong><%= current_customer.first_name %> <%= current_customer.last_name %></strong><br>
+          <%= current_customer.address %><br>
+          <%= @province.name %>
+        </p>
+        <%= link_to "Edit Profile / Change Address", edit_customer_registration_path, class: "button is-small is-light" %>
+      </div>
+
+      <div class="box">
+        <h2 class="subtitle is-4">Order Items</h2>
+        <table class="table is-fullwidth">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th class="has-text-right">Price</th>
+              <th class="has-text-centered">Qty</th>
+              <th class="has-text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @cart.each do |product_id, quantity| %>
+              <% product = Product.find_by(id: product_id) %>
+              <% if product %>
+                <tr>
+                  <td><%= product.product_name %></td>
+                  <td class="has-text-right"><%= number_to_currency(product.price) %></td>
+                  <td class="has-text-centered"><%= quantity %></td>
+                  <td class="has-text-right"><%= number_to_currency(product.price * quantity) %></td>
+                </tr>
+              <% end %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
 
-  <table class="table is-fullwidth is-striped is-hoverable mt-4">
-    <thead>
-      <tr>
-        <th>Item</th>
-        <th class="has-text-centered">Qty</th>
-        <th class="has-text-right">Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @cart_items.each do |product| %>
-        <% quantity = session[:cart][product.id.to_s].to_i %>
-        <tr>
-          <td class="is-vcentered"><%= product.product_name %></td>
-          <td class="has-text-centered is-vcentered"><%= quantity %></td>
-          <td class="has-text-right is-vcentered"><%= number_to_currency(product.price * quantity) %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+    <div class="column is-4">
+      <div class="box">
+        <h2 class="subtitle is-4">Order Summary</h2>
+        <div class="is-flex is-justify-content-space-between mb-2">
+          <span>Subtotal</span>
+          <span><%= number_to_currency(@subtotal) %></span>
+        </div>
+        
+        <% if @gst > 0 %>
+          <div class="is-flex is-justify-content-space-between mb-2">
+            <span>GST (<%= number_to_percentage(@province.gst * 100, precision: 1) %>)</span>
+            <span><%= number_to_currency(@gst) %></span>
+          </div>
+        <% end %>
+        
+        <% if @pst > 0 %>
+          <div class="is-flex is-justify-content-space-between mb-2">
+            <span>PST (<%= number_to_percentage(@province.pst * 100, precision: 1) %>)</span>
+            <span><%= number_to_currency(@pst) %></span>
+          </div>
+        <% end %>
+        
+        <% if @hst > 0 %>
+          <div class="is-flex is-justify-content-space-between mb-2">
+            <span>HST (<%= number_to_percentage(@province.hst * 100, precision: 1) %>)</span>
+            <span><%= number_to_currency(@hst) %></span>
+          </div>
+        <% end %>
+        
+        <hr>
+        <div class="is-flex is-justify-content-space-between mb-5">
+          <strong class="is-size-4">Total</strong>
+          <strong class="is-size-4"><%= number_to_currency(@total) %></strong>
+        </div>
 
-  <div class="has-text-right mt-5">
-    <p class="is-size-6 mb-1"><strong>Subtotal:</strong> <%= number_to_currency(@subtotal) %></p>
-    
-    <% if @province.gst > 0 %>
-      <p class="is-size-6 mb-1">GST (<%= number_to_percentage(@province.gst * 100, precision: 2) %>): <%= number_to_currency(@gst) %></p>
-    <% end %>
-    
-    <% if @province.pst > 0 %>
-      <p class="is-size-6 mb-1">PST (<%= number_to_percentage(@province.pst * 100, precision: 2) %>): <%= number_to_currency(@pst) %></p>
-    <% end %>
-    
-    <% if @province.hst > 0 %>
-      <p class="is-size-6 mb-1">HST (<%= number_to_percentage(@province.hst * 100, precision: 2) %>): <%= number_to_currency(@hst) %></p>
-    <% end %>
-    
-    <h3 class="title is-4 mt-3 pt-3" style="border-top: 2px solid #eee;">
-      Total: <%= number_to_currency(@total) %>
-    </h3>
-  </div>
-
-  <div class="has-text-centered mt-6">
-    <%= button_to "Complete Order", checkout_create_path, method: :post, class: "button is-success is-large" %>
+        <%= button_to "Proceed to Secure Payment", checkout_create_path, method: :post, class: "button is-primary is-fullwidth is-large" %>
+      </div>
+    </div>
   </div>
 </div>

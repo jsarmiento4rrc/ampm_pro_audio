@@ -2,71 +2,73 @@ class CheckoutController < ApplicationController
   before_action :authenticate_customer!
 
   def index
-    @cart_items = Product.find(session[:cart].keys)
-    
-    @subtotal = 0
-    @cart_items.each do |product|
-      quantity = session[:cart][product.id.to_s].to_i
-      @subtotal += product.price * quantity
-    end
-
-    @province = current_customer.province
-    
-    @gst = @subtotal * @province.gst
-    @pst = @subtotal * @province.pst
-    @hst = @subtotal * @province.hst
-    
-    @total = @subtotal + @gst + @pst + @hst
-  end
-
-  def create
-    @cart_items = Product.find(session[:cart].keys)
-    @province = current_customer.province
-
-    if @cart_items.empty?
+    @cart = session[:cart] || {}
+    if @cart.empty?
       redirect_to root_path, alert: "Your cart is empty."
       return
     end
 
-    # Recalculate totals securely on the server
-    subtotal = 0
-    @cart_items.each do |product|
-      quantity = session[:cart][product.id.to_s].to_i
-      subtotal += product.price * quantity
+    @province = current_customer.province
+    @subtotal = 0
+    @cart.each do |product_id, quantity|
+      product = Product.find_by(id: product_id)
+      @subtotal += (product.price * quantity) if product
     end
 
-    gst = subtotal * @province.gst
-    pst = subtotal * @province.pst
-    hst = subtotal * @province.hst
-    total = subtotal + gst + pst + hst
+    @gst = @subtotal * (@province.gst || 0)
+    @pst = @subtotal * (@province.pst || 0)
+    @hst = @subtotal * (@province.hst || 0)
+    @total = @subtotal + @gst + @pst + @hst
+  end
 
-    # 1. Create the Order Record
-    order = current_customer.orders.build(
-      subtotal: subtotal,
-      gst: gst,
-      pst: pst,
-      hst: hst,
-      total: total,
-      status: "New"
+  def create
+    # HARD-CODED KEY: This ensures the controller uses the correct key immediately
+    Stripe.api_key = 'sk_test_51THHZcCrPyiHw7vH3zXXD2gWiVV9wCzidmP2F9bKvBmiLRhzAyssc0XO0UtBUGluZjVPcAoGvonzY0FhE01CADeDY00Cxm7ouM1'
+    
+    @cart = session[:cart] || {}
+    @province = current_customer.province
+    
+    line_items = []
+    subtotal = 0
+
+    @cart.each do |product_id, quantity|
+      product = Product.find_by(id: product_id)
+      if product
+        subtotal += product.price * quantity
+        line_items << {
+          price_data: {
+            currency: 'cad',
+            product_data: { name: product.product_name },
+            unit_amount: (product.price * 100).to_i
+          },
+          quantity: quantity
+        }
+      end
+    end
+
+    # Add Tax line items
+    line_items << { price_data: { currency: 'cad', product_data: { name: 'GST' }, unit_amount: (subtotal * @province.gst * 100).to_i }, quantity: 1 } if @province.gst.to_f > 0
+    line_items << { price_data: { currency: 'cad', product_data: { name: 'PST' }, unit_amount: (subtotal * @province.pst * 100).to_i }, quantity: 1 } if @province.pst.to_f > 0
+    line_items << { price_data: { currency: 'cad', product_data: { name: 'HST' }, unit_amount: (subtotal * @province.hst * 100).to_i }, quantity: 1 } if @province.hst.to_f > 0
+
+    @session = Stripe::Checkout::Session.create(
+      payment_method_types: ['card'],
+      mode: 'payment',
+      success_url: checkout_success_url + "?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: checkout_cancel_url,
+      customer_email: current_customer.email,
+      line_items: line_items
     )
 
-    if order.save
-      # 2. Create the Line Item Records
-      @cart_items.each do |product|
-        quantity = session[:cart][product.id.to_s].to_i
-        order.line_items.create(
-          product: product,
-          quantity: quantity,
-          price: product.price # Saves the price at the exact moment of purchase
-        )
-      end
+    redirect_to @session.url, allow_other_host: true
+  end
 
-      # 3. Clear the Cart Session
-      session[:cart] = {}
+  def success
+    session[:cart] = {}
+    redirect_to root_path, notice: "Payment successful!"
+  end
 
-      redirect_to root_path, notice: "Order successfully placed! Thank you for your purchase."
-    else
-      redirect_to checkout_path, alert: "There was an issue processing your order. Please try again."
-    end
+  def cancel
+    redirect_to cart_path, alert: "Payment cancelled."
   end
 end

@@ -1,49 +1,62 @@
-<div class="is-flex is-justify-content-space-between is-align-items-flex-end mb-5">
-  <h1 class="title is-2 mb-0">Product Catalog</h1>
-  <p class="subtitle is-6 has-text-grey mb-1">Showing <%= @products.total_count %> items</p>
-</div>
-
-<div class="box has-background-light mb-6">
-  <%= form_with url: root_path, method: :get, local: true do |f| %>
-    <div class="field is-grouped is-grouped-multiline is-align-items-flex-end">
-      
-      <div class="control">
-        <%= f.label :keyword, "Keyword", class: "label is-small has-text-grey" %>
-        <%= f.text_field :keyword, value: params[:keyword], placeholder: "Search gear...", class: "input" %>
-      </div>
-
-      <div class="control">
-        <%= f.label :category_id, "Category", class: "label is-small has-text-grey" %>
-        <div class="select">
-          <%= f.collection_select :category_id, Category.all, :id, :category_name, { include_blank: "All Categories", selected: params[:category_id] } %>
-        </div>
-      </div>
-
-      <div class="control">
-        <%= f.label :filter, "Filter By", class: "label is-small has-text-grey" %>
-        <div class="select">
-          <%= f.select :filter, options_for_select([["All", ""], ["New (Last 3 Days)", "new"], ["Recently Updated", "recently_updated"]], params[:filter]) %>
-        </div>
-      </div>
-
-      <div class="control">
-        <%= f.submit "Search", class: "button is-dark" %>
-      </div>
-
-      <% if params[:keyword].present? || params[:category_id].present? || params[:filter].present? %>
-        <div class="control">
-          <%= link_to "Clear Filters", root_path, class: "button is-text has-text-danger" %>
-        </div>
-      <% end %>
-
+<section class="hero is-info is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">Product Catalog</h1>
+      <h2 class="subtitle">Premium Audio Equipment</h2>
     </div>
-  <% end %>
-</div>
+  </div>
+</section>
 
-<div class="columns is-multiline">
-  <%= render partial: "product", collection: @products %>
-</div>
+<div class="container mt-5">
+  <div class="box">
+    <%= form_with url: products_path, method: :get, local: true do |f| %>
+      <div class="columns">
+        <div class="column is-4">
+          <%= f.text_field :keyword, value: params[:keyword], class: "input", placeholder: "Search for gear..." %>
+        </div>
+        <div class="column is-3">
+          <div class="select is-fullwidth">
+            <%= f.collection_select :category_id, @categories, :id, :category_name, include_blank: "All Categories", selected: params[:category_id] %>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="select is-fullwidth">
+            <%= f.select :filter, [["New Products", "new"], ["Recently Updated", "updated"]], include_blank: "No Extra Filters", selected: params[:filter] %>
+          </div>
+        </div>
+        <div class="column is-2">
+          <%= f.submit "Filter", class: "button is-info is-fullwidth" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
 
-<div class="is-flex is-justify-content-center mt-6">
-  <%= paginate @products %>
+  <div class="columns is-multiline">
+    <% @products.each do |product| %>
+      <div class="column is-4">
+        <div class="card">
+          <div class="card-image">
+            <figure class="image is-4by3">
+              <% if product.image.attached? %>
+                <%= image_tag product.image %>
+              <% else %>
+                <img src="https://via.placeholder.com/400x300" alt="No image">
+              <% end %>
+            </figure>
+          </div>
+          <div class="card-content">
+            <p class="title is-5"><%= product.product_name %></p>
+            <p class="subtitle is-6 has-text-success"><%= number_to_currency(product.price) %></p>
+            <%= link_to "Details", product_path(product), class: "button is-link is-small is-fullwidth" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="section">
+    <nav class="pagination is-centered">
+      <%= paginate @products %>
+    </nav>
+  </div>
 </div>

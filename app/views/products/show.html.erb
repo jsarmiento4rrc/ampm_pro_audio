@@ -1,47 +1,61 @@
-<div class="box mt-4">
-  <div class="columns is-vcentered">
+<div class="container mt-6">
+  <div class="columns is-desktop is-vcentered">
     
-    <div class="column is-half">
-      <% if @product.image.attached? %>
-        <figure class="image">
-          <%= image_tag @product.image, style: "border-radius: 8px; max-height: 500px; object-fit: contain;" %>
-        </figure>
-      <% else %>
-        <div class="notification is-light has-text-centered">
-          No image available for this product.
-        </div>
-      <% end %>
+    <div class="column is-6-desktop">
+      <div class="box is-flex is-align-items-center is-justify-content-center" style="min-height: 500px; border: 1px solid #eee;">
+        <% if @product.image.attached? %>
+          <%= image_tag @product.image, style: "max-height: 450px; width: auto; object-fit: contain;" %>
+        <% else %>
+          <div class="has-text-centered">
+            <span class="icon is-large has-text-grey-lighter mb-4"><i class="fas fa-image fa-4x"></i></span>
+            <p class="has-text-grey-light is-size-4">No Image Available</p>
+          </div>
+        <% end %>
+      </div>
     </div>
 
-    <div class="column is-half">
-      <p class="is-size-6 has-text-grey is-uppercase mb-2"><%= @product.category.category_name %></p>
-      <h1 class="title is-2 mb-4"><%= @product.product_name %></h1>
-      <h2 class="title is-3 has-text-primary mb-5"><%= number_to_currency(@product.price) %></h2>
+    <div class="column is-5-desktop is-offset-1-desktop">
+      <nav class="breadcrumb is-small mb-5" aria-label="breadcrumbs">
+        <ul>
+          <li><%= link_to "Catalog", root_path %></li>
+          <li><%= link_to @product.category.category_name, category_path(@product.category) %></li>
+          <li class="is-active"><a href="#"><%= @product.product_name %></a></li>
+        </ul>
+      </nav>
+
+      <h1 class="title is-1 has-text-weight-bold mb-2"><%= @product.product_name %></h1>
+      <p class="subtitle is-3 has-text-primary mb-5"><%= number_to_currency(@product.price) %></p>
       
-      <div class="content is-medium mb-6">
-        <p><%= @product.description %></p>
+      <div class="content mb-6">
+        <h4 class="title is-5 has-text-grey">Description</h4>
+        <p class="is-size-5"><%= @product.description %></p>
+        <div class="tags has-addons">
+          <span class="tag is-dark">Inventory</span>
+          <span class="tag is-info"><%= @product.stock_quantity %> units left</span>
+        </div>
       </div>
 
-      <div class="box has-background-light">
-        <%= form_with url: cart_add_path, method: :post do |f| %>
-          <%= f.hidden_field :product_id, value: @product.id %>
-          
-          <div class="field is-grouped is-align-items-flex-end">
+      <div class="box has-background-white-ter p-5">
+        <%= form_with url: add_to_cart_path(@product), method: :post do |f| %>
+          <div class="field has-addons">
             <div class="control">
-              <%= f.label :quantity, "Quantity", class: "label" %>
-              <div class="select">
-                <%= f.select :quantity, (1..10).to_a, selected: 1 %>
-              </div>
+              <span class="select is-large">
+                <%= f.select :quantity, options_for_select(1..10) %>
+              </span>
             </div>
-            
-            <div class="control">
-              <%= f.submit "Add to Cart", class: "button is-primary is-medium" %>
+            <div class="control is-expanded">
+              <%= f.submit "Add to Cart", class: "button is-primary is-large is-fullwidth has-text-weight-bold" %>
             </div>
           </div>
         <% end %>
       </div>
-      
-      <%= link_to "← Back to Catalog", root_path, class: "button is-text mt-4" %>
+
+      <div class="mt-4">
+        <%= link_to root_path, class: "button is-light is-fullwidth" do %>
+          <span class="icon"><i class="fas fa-arrow-left"></i></span>
+          <span>Back to Catalog</span>
+        <% end %>
+      </div>
     </div>
 
   </div>
