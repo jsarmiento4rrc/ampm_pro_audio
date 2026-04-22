@@ -95,3 +95,19 @@ products.each do |prod|
 end
 
 puts "Seeding complete! Created #{Category.count} categories, #{Product.count} products, and #{Province.count} provinces."
+
+
+puts "Creating Admin User..."
+AdminUser.find_or_create_by!(email: 'admin@example.com') do |admin|
+  admin.password = 'password'
+  admin.password_confirmation = 'password'
+end
+
+puts "Creating CMS Pages..."
+Page.find_or_create_by!(title: 'About Us') do |page|
+  page.content = "Welcome to AMPM Pro Audio. We provide premium audio equipment for DJs, producers, and audio professionals."
+end
+
+Page.find_or_create_by!(title: 'Contact') do |page|
+  page.content = "Have questions about our gear? Email us at support@ampmproaudio.com or call us directly."
+end
