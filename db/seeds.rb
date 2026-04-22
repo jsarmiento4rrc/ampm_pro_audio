@@ -1,82 +1,92 @@
 puts "Clearing old data..."
+# Destroy in specific order to prevent foreign key constraint errors
 Product.destroy_all
 Category.destroy_all
 Province.destroy_all
 
 puts "Creating Provinces with Tax Rates..."
-Province.create!([
-  { name: "Alberta", gst: 0.05, pst: 0.00, hst: 0.00 },
-  { name: "British Columbia", gst: 0.05, pst: 0.07, hst: 0.00 },
-  { name: "Manitoba", gst: 0.05, pst: 0.07, hst: 0.00 },
-  { name: "New Brunswick", gst: 0.00, pst: 0.00, hst: 0.15 },
-  { name: "Newfoundland and Labrador", gst: 0.00, pst: 0.00, hst: 0.15 },
-  { name: "Northwest Territories", gst: 0.05, pst: 0.00, hst: 0.00 },
-  { name: "Nova Scotia", gst: 0.00, pst: 0.00, hst: 0.15 },
-  { name: "Nunavut", gst: 0.05, pst: 0.00, hst: 0.00 },
-  { name: "Ontario", gst: 0.00, pst: 0.00, hst: 0.13 },
-  { name: "Prince Edward Island", gst: 0.00, pst: 0.00, hst: 0.15 },
-  { name: "Quebec", gst: 0.05, pst: 0.09975, hst: 0.00 },
-  { name: "Saskatchewan", gst: 0.05, pst: 0.06, hst: 0.00 },
-  { name: "Yukon", gst: 0.05, pst: 0.00, hst: 0.00 }
-])
+provinces = [
+  { name: 'Alberta', pst: 0.0, gst: 0.05, hst: 0.0 },
+  { name: 'British Columbia', pst: 0.07, gst: 0.05, hst: 0.0 },
+  { name: 'Manitoba', pst: 0.07, gst: 0.05, hst: 0.0 },
+  { name: 'New Brunswick', pst: 0.0, gst: 0.0, hst: 0.15 },
+  { name: 'Newfoundland and Labrador', pst: 0.0, gst: 0.0, hst: 0.15 },
+  { name: 'Northwest Territories', pst: 0.0, gst: 0.05, hst: 0.0 },
+  { name: 'Nova Scotia', pst: 0.0, gst: 0.0, hst: 0.15 },
+  { name: 'Nunavut', pst: 0.0, gst: 0.05, hst: 0.0 },
+  { name: 'Ontario', pst: 0.0, gst: 0.0, hst: 0.13 },
+  { name: 'Prince Edward Island', pst: 0.0, gst: 0.0, hst: 0.15 },
+  { name: 'Quebec', pst: 0.09975, gst: 0.05, hst: 0.0 },
+  { name: 'Saskatchewan', pst: 0.06, gst: 0.05, hst: 0.0 },
+  { name: 'Yukon', pst: 0.0, gst: 0.05, hst: 0.0 }
+]
+
+provinces.each do |prov|
+  Province.create!(prov)
+end
 
 puts "Creating Categories..."
-mics = Category.create!(name: "Microphones")
-mixers = Category.create!(name: "Mixers")
-speakers = Category.create!(name: "Speakers")
-cables = Category.create!(name: "Cables")
+# The critical fix: Using category_name instead of name
+cat_microphones = Category.create!(category_name: 'Microphones')
+cat_mixers      = Category.create!(category_name: 'Mixers')
+cat_speakers    = Category.create!(category_name: 'Speakers')
+cat_accessories = Category.create!(category_name: 'Accessories')
 
 puts "Creating Products..."
-
-Product.create!([
-  {
-    product_name: "Shure SM7B",
-    description: "Legendary vocal dynamic microphone, perfect for broadcasting, podcasting, and studio recording.",
-    price: 529.00,
-    category: mics
+products = [
+  { 
+    name: "Shure SM7B", 
+    description: "Legendary vocal microphone for broadcast, podcast, and studio recording. Smooth, flat, wide-range frequency response.", 
+    price: 539.00, 
+    category: cat_microphones 
   },
-  {
-    product_name: "Rode NT1-A",
-    description: "Large-diaphragm cardioid condenser microphone with an ultra-low noise floor.",
-    price: 329.99,
-    category: mics
+  { 
+    name: "Rode PodMic", 
+    description: "Broadcast-quality dynamic microphone optimized for podcasting and vocal applications.", 
+    price: 129.00, 
+    category: cat_microphones 
   },
-  {
-    product_name: "Pioneer DJ DJM-A9",
-    description: "Next-generation 4-channel professional DJ club mixer.",
-    price: 3599.00,
-    category: mixers
+  { 
+    name: "Pioneer DJ DJM-A9", 
+    description: "Next-generation professional 4-channel DJ mixer with stunningly clear sound quality and enhanced effects.", 
+    price: 3699.00, 
+    category: cat_mixers 
   },
-  {
-    product_name: "Yamaha MG10XU",
-    description: "10-Input Stereo Mixer with built-in SPX digital effects and USB audio interface.",
-    price: 289.50,
-    category: mixers
+  { 
+    name: "Allen & Heath Xone:96", 
+    description: "Uncompromising analog DJ mixer with dual 32-bit USB soundcards and legendary Xone VCF filters.", 
+    price: 2899.00, 
+    category: cat_mixers 
   },
-  {
-    product_name: "QSC K12.2",
-    description: "2000W 12-inch powered PA speaker with advanced DSP.",
-    price: 1299.00,
-    category: speakers
+  { 
+    name: "QSC K12.2", 
+    description: "2000W 12-inch powered active speaker offering incredible audio performance and rugged durability.", 
+    price: 1299.00, 
+    category: cat_speakers 
   },
-  {
-    product_name: "KRK Rokit 5 G4",
-    description: "5-inch powered nearfield studio monitor.",
-    price: 249.00,
-    category: speakers
+  { 
+    name: "KRK Rokit 5 G4", 
+    description: "5-inch powered nearfield studio monitor with DSP-driven Graphic EQ and Kevlar drivers.", 
+    price: 249.00, 
+    category: cat_speakers 
   },
-  {
-    product_name: "Mogami Gold Studio 15",
-    description: "15-foot premium XLR microphone cable with Neutrik connectors.",
-    price: 89.95,
-    category: cables
+  { 
+    name: "Pro Co 20ft XLR Cable", 
+    description: "Heavy-duty 20-foot XLR microphone cable built for stage and studio reliability.", 
+    price: 29.99, 
+    category: cat_accessories 
   },
-  {
-    product_name: "Hosa Pro TRS Cable",
-    description: "10-foot balanced interconnect cable, 1/4 inch TRS to 1/4 inch TRS.",
-    price: 19.99,
-    category: cables
+  { 
+    name: "On-Stage Speaker Stands", 
+    description: "Pair of heavy-duty aluminum tripod speaker stands with carrying bag. Supports up to 120 lbs.", 
+    price: 89.99, 
+    category: cat_accessories 
   }
-])
+]
+
+products.each do |prod|
+  # Using create! so the terminal will explicitly tell us if a validation fails
+  Product.create!(prod)
+end
 
 puts "Seeding complete! Created #{Category.count} categories, #{Product.count} products, and #{Province.count} provinces."
