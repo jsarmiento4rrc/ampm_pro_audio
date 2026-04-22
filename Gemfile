@@ -7,7 +7,13 @@ ruby "3.1.2"
 gem "rails", "~> 7.0.10"
 
 # The original database the project was created with
-gem "sqlite3", "~> 1.4"
+group :development, :test do
+  gem "sqlite3", "~> 1.4"
+end
+
+group :production do
+  gem "pg"
+end
 
 # Use the Puma web server [Requirement 5.8]
 gem "puma", "~> 5.0"

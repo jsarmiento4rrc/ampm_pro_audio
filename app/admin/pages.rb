@@ -4,8 +4,8 @@ ActiveAdmin.register Page do
   form do |f|
     f.inputs do
       f.input :title
-      f.input :permalink, hint: "Use lowercase without spaces (e.g., 'about' or 'contact')"
-      f.input :content, as: :text
+      f.input :permalink, hint: "Used for the URL (e.g., 'about' or 'contact'). Use lowercase, no spaces."
+      f.input :content
     end
     f.actions
   end

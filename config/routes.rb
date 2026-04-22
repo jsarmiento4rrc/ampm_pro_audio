@@ -18,7 +18,7 @@ Rails.application.routes.draw do
     post 'update/:product_id', to: 'carts#update', as: 'update'
   end
 
-  # Checkout routes (Requirement 3.3.1 & 3.3.2)
+  # Checkout routes
   scope '/checkout' do
     post 'create', to: 'checkout#create', as: 'checkout_create'
     get 'success', to: 'checkout#success', as: 'checkout_success'
@@ -27,6 +27,9 @@ Rails.application.routes.draw do
 
   # Search routes
   get 'search', to: 'products#search', as: 'search_products'
+
+  # Dynamic CMS Pages (Requirement 3.2.1)
+  get '/pages/:permalink', to: 'pages#show', as: 'page'
 
   # Root page
   root "products#index"
