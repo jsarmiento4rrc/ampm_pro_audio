@@ -26,58 +26,58 @@ provinces.each do |prov|
 end
 
 puts "Creating Categories..."
-# The critical fix: Using category_name instead of name
 cat_microphones = Category.create!(category_name: 'Microphones')
 cat_mixers      = Category.create!(category_name: 'Mixers')
 cat_speakers    = Category.create!(category_name: 'Speakers')
 cat_accessories = Category.create!(category_name: 'Accessories')
 
 puts "Creating Products..."
+# The fix: Using product_name instead of name
 products = [
   { 
-    name: "Shure SM7B", 
+    product_name: "Shure SM7B", 
     description: "Legendary vocal microphone for broadcast, podcast, and studio recording. Smooth, flat, wide-range frequency response.", 
     price: 539.00, 
     category: cat_microphones 
   },
   { 
-    name: "Rode PodMic", 
+    product_name: "Rode PodMic", 
     description: "Broadcast-quality dynamic microphone optimized for podcasting and vocal applications.", 
     price: 129.00, 
     category: cat_microphones 
   },
   { 
-    name: "Pioneer DJ DJM-A9", 
+    product_name: "Pioneer DJ DJM-A9", 
     description: "Next-generation professional 4-channel DJ mixer with stunningly clear sound quality and enhanced effects.", 
     price: 3699.00, 
     category: cat_mixers 
   },
   { 
-    name: "Allen & Heath Xone:96", 
+    product_name: "Allen & Heath Xone:96", 
     description: "Uncompromising analog DJ mixer with dual 32-bit USB soundcards and legendary Xone VCF filters.", 
     price: 2899.00, 
     category: cat_mixers 
   },
   { 
-    name: "QSC K12.2", 
+    product_name: "QSC K12.2", 
     description: "2000W 12-inch powered active speaker offering incredible audio performance and rugged durability.", 
     price: 1299.00, 
     category: cat_speakers 
   },
   { 
-    name: "KRK Rokit 5 G4", 
+    product_name: "KRK Rokit 5 G4", 
     description: "5-inch powered nearfield studio monitor with DSP-driven Graphic EQ and Kevlar drivers.", 
     price: 249.00, 
     category: cat_speakers 
   },
   { 
-    name: "Pro Co 20ft XLR Cable", 
+    product_name: "Pro Co 20ft XLR Cable", 
     description: "Heavy-duty 20-foot XLR microphone cable built for stage and studio reliability.", 
     price: 29.99, 
     category: cat_accessories 
   },
   { 
-    name: "On-Stage Speaker Stands", 
+    product_name: "On-Stage Speaker Stands", 
     description: "Pair of heavy-duty aluminum tripod speaker stands with carrying bag. Supports up to 120 lbs.", 
     price: 89.99, 
     category: cat_accessories 
@@ -85,7 +85,6 @@ products = [
 ]
 
 products.each do |prod|
-  # Using create! so the terminal will explicitly tell us if a validation fails
   Product.create!(prod)
 end
 
